@@ -26,19 +26,15 @@ def index():
 @app.route('/blog', methods=['GET'])
 def blog():
     #retrieves and displays all blog posts (title, body) from DB
-    # !!Not done!! Contains hyperlinks on titles to allow navigation..
-    #..to single page ("/blog?ID=#")
-    blogs = Blog.query.all()
-    return render_template('blog.html', title='Build a Blog', blogs=blogs)
-#You shouldn't have a separate route to handle showing individual entries,
-#it should all be handled in your main `/blog` route.
-#With an if statement that determines whether or not you should display the 
-# list of all blogs or a single blog depending on whether or not
-# the `id` query parameter was part of the GET request.
-#your `/blog` handler should be able to see the `id` query parameter, and then render
-# your single entry _template_.
-# If there's no `id` query parameter, it should render your main blog list template.
-#
+    #Contains hyperlinks on titles to allow navigation to single page ("/blog?ID=#")
+
+    if request.args.get('id'):
+        blog_id = int(request.args.get('id'))
+        blog_post = Blog.query.get(blog_id)
+        return render_template('singlepage.html', title=blog_post.title, body=blog_post.body)
+    else:
+        blogs = Blog.query.all()    
+        return render_template('blog.html', title='Build a Blog', blogs=blogs)
 
 @app.route('/newpost', methods=['POST', 'GET'])
 def newpost(): 
@@ -57,10 +53,11 @@ def newpost():
             db.session.add(blog_post)
             db.session.commit() 
             return render_template('singlepage.html', title=title, body=body)
-        else:
-            flash('Title and body cannot be blank.', 'error')
-            return render_template('newpost.html')
-    return render_template('newpost.html', title='Add a Blog Entry')
+        if title =="":
+            flash('Please fill in the title.', 'error')
+        if body =="":
+            flash('Please fill in the body.', 'error')
+     return render_template('newpost.html', title='Add a Blog Entry')
         
 if __name__ == '__main__':
     app.run()

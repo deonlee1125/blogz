@@ -7,12 +7,21 @@
         <style>
             .error{
                  color: red;
+                 font-style: italic;
             }
         </style>
     </head>
 <body>
         <h3><a href = "/blog">Main Blog Page</a>&nbsp&nbsp&nbsp<a href="/newpost">Add an Entry</a></h3>
    
+    {% with messages = get_flashed_messages(with_categories=True) %}
+        <ul>
+        {% for category,message in messages %}
+            <li class="{{category}}">{{message}}</li>
+        {% endfor %}
+        </ul>
+    {% endwith %}       
+    
     {% block content %}
     {% endblock %}
 
