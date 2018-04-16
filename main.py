@@ -57,7 +57,8 @@ def newpost():
             flash('Please fill in the title.', 'error')
         if body =="":
             flash('Please fill in the body.', 'error')
-     return render_template('newpost.html', title='Add a Blog Entry')
+            redirect("/blog?id=blog.id")
+    return render_template('newpost.html', title='Add a Blog Entry')
         
 if __name__ == '__main__':
     app.run()
