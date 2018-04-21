@@ -5,17 +5,31 @@
         <title>{{title}}</title>
     
         <style>
-            .error{
-                 color: red;
-                 font-style: italic;
+            * {
+            font-family: Verdana;
             }
+
+            .error{
+                color: red;
+                font-style: italic;
+            }
+            
+            .correct{
+                color: green;
+                font-style: italic;
+            }
+
+            label{
+                font-weight: bold
+            }
+
         </style>
     </head>
 <body>
-        <h3><a href = "/blog">Main Blog Page</a>&nbsp&nbsp&nbsp<a href="/newpost">Add an Entry</a></h3>
-   
+        <h3><a href = "/">home</a> &nbsp &nbsp &nbsp &nbsp &nbsp <a href="/blog">all posts</a> &nbsp &nbsp &nbsp &nbsp &nbsp<a href="/blog/newpost">new post</a>
+            <span style="margin-left:16em"><a href = "/login">login</a> </span> &nbsp &nbsp &nbsp &nbsp &nbsp <a href="/blog">logout</a></h3>   
     {% with messages = get_flashed_messages(with_categories=True) %}
-        <ul>
+        <ul class=flashes>
         {% for category,message in messages %}
             <li class="{{category}}">{{message}}</li>
         {% endfor %}
