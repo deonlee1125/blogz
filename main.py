@@ -38,20 +38,25 @@ class User(db.Model):
 @app.before_request
 def require_login():
     allowed_routes = ['index', 'blog', 'login', 'signup']
+    if 'username' in session:
+        flash("Logged in", "correct")
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
-@app.route('/')
+@app.route('/', methods=['POST', 'GET'])
 def index():
     #displays a bulleted list of all users with logins with hyperlinks
     #to each author's own posts (singleUser)
     #if method == 'GET': render 'singleUser.html'
-    #return redirect('/blog?user= {username}')  
-    #usernames = Blog.query.all()
-    #if request.method == 'POST':
-        #render_template('index.html', usernames=usernames)   
-    #return render_template("singleUser.html", usernames=usernames)
-    return redirect('/blog')
+    #return redirect('/blog?user= {username}') 
+    
+    users = User.query.all()
+    if request.method == 'GET':
+        return render_template('index.html', users=users)
+    else:
+        owner = User.query.filter_by(username=session['username']).first()
+        return render_template("singleUser.html", users=users, owner=owner)
+
 
 @app.route('/signup', methods=['POST', 'GET'])
 def signup():
@@ -96,8 +101,8 @@ def login():
         if user and user.password == password:
             session['username'] = username
             flash("Logged in", "correct")
-            return render_template('newpost.html')
-            #return redirect('/')
+            #return render_template('newpost.html')
+            return redirect('/blog/newpost')
         else:
             flash('User password incorrect, or user does not exist', 'error')
 
@@ -111,7 +116,9 @@ def blog():
     if request.args.get('id'):
         blog_id = int(request.args.get('id'))
         blog_post = Blog.query.get(blog_id)
-        return render_template('singlepage.html', title=blog_post.title, body=blog_post.body)
+        user_id = int(request.args.get('id'))
+        username = User.query.get(user_id)
+        return render_template('singlepage.html', title=blog_post.title, body=blog_post.body, username=username.username)
     else:
         blogs = Blog.query.all()
         users = User.query.all()
@@ -125,7 +132,7 @@ def newpost():
             #..If OK, redirect to singlepage '/blog?ID=#' and display
     #If GET, display singlepage; if POST posts blogs to DB
 #User.query.filter_by(email=session['email']).first() find first user with this email
-#movie = Movie(new)movie_name, usr)
+#movie = Movie(new_movie_name, usr)
 
     if request.method == 'POST':
         title = request.form['title']
@@ -135,6 +142,7 @@ def newpost():
             flash('Blog posts must contain a title and body.', 'error')
             return render_template('newpost.html', title=title, body=body)
         else:
+            owner = User.query.filter_by(username=session['username']).first()
             blog_post = Blog(title, body, owner)
             db.session.add(blog_post)
             db.session.commit()
