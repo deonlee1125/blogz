@@ -38,8 +38,6 @@ class User(db.Model):
 @app.before_request
 def require_login():
     allowed_routes = ['index', 'blog', 'login', 'signup']
-    if 'username' in session:
-        flash("Logged in", "correct")
     if request.endpoint not in allowed_routes and 'username' not in session:
         return redirect('/login')
 
